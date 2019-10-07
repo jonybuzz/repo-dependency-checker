@@ -1,14 +1,20 @@
 var express = require('express');
 var router = express.Router();
+const { createBasicAuth } = require("@octokit/auth-basic");
 const Octokit = require("@octokit/rest");
 var base64 = require('base-64');
 const YAML = require('yaml')
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/:env', function(req, res, next) {
+
+  var env = req.params.env;
 
   const octokit = Octokit({
-    auth: "c1ad5bf34e80d78eb04f165f95d7fa00b74a0dad",
+    auth: {
+      username:'xxx',
+      password:'xxx'
+    },
     userAgent: 'repo-dependency-checker v1.0.0',
     previews: ['jean-grey', 'symmetra'],
     baseUrl: 'https://api.github.com',
@@ -26,10 +32,10 @@ router.get('/', function(req, res, next) {
   })
 
   octokit.repos.getContents({
-    owner:'lorfinsa',
-    repo:'ccc-compose',
-    path:'ccc-apis-nr.yml',
-    ref:'staging'
+    owner: 'lorfinsa',
+    repo: 'ccc-compose',
+    path: 'ccc-apis-nr.yml',
+    ref: env
   }).then(function(resp){
     var fileContent = base64.decode(resp.data.content)
     var yaml = YAML.parse(fileContent)
@@ -44,7 +50,8 @@ router.get('/', function(req, res, next) {
         }
     })
     res.send(apis)
-  }).catch(err => console.log(err))
+  }).catch(err => res.send(err))
+
 });
 
 module.exports = router;
