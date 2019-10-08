@@ -8,6 +8,7 @@ const config = require('../private/config');
 
 router.get('/:env', function(req, res, next) {
 
+    let strictCheck = req.query.strict;
     var env = req.params.env
 
     const octokit = Octokit({
@@ -47,44 +48,55 @@ router.get('/:env', function(req, res, next) {
             }
         })
 
-        apis.map(async function(api) {
-            console.debug('Buscando dependencias de ' + api.name)
-            octokit.repos.getContents({
-                owner: 'lorfinsa',
-                repo: api.name,
-                path: 'DEPENDENCIES.md',
-                ref: 'v' + api.version
-            }).then(function(resp) {
-                var dependenciesMdContent = base64.decode(resp.data.content)
-                lines = dependenciesMdContent.split("\n");
-                lines.shift()
-                lines.shift() //para eliminar header de tabla
-                var dependencies = lines.map(function(line){
-                    if(line){
-                        var partes = line.split('|')
-                        if(partes.length === 2 && partes[0] && partes[1])
-                        return {
-                            name: partes[0].trim(),
-                            version: partes[1].trim()
-                        }
-                    }
-                }).filter(function( element ) {
-                    return element !== undefined;
-                });
-                api.dependencies = dependencies
-                 console.dir(api)
-                return api;
-            }).catch(function(err) {
-                if(err.status === 404){
-                    console.error(api.name + ' no tiene declaradas las dependencias')
-                } else {
-                    console.error('Error ' + err.status + ' buscando dependencias de ' + api.name)
-                }
-            })
-        })
+        var results = Promise.all(apis.map(function(api) {
 
-        res.send(respuesta)
-    }).catch(err => res.send(err))
+                console.debug('Buscando dependencias de ' + api.name)
+
+                return new Promise((resolve, reject) => {
+                    octokit.repos.getContents({
+                        owner: 'lorfinsa',
+                        repo: api.name,
+                        path: 'DEPENDENCIES.md',
+                        ref: 'v' + api.version
+                    }).then(resp => {
+                        var dependenciesMdContent = base64.decode(resp.data.content)
+                        lines = dependenciesMdContent.split("\n");
+                        lines.shift()
+                        lines.shift() //para eliminar header de tabla
+                        var dependencies = lines.map(function(line){
+                            if(line){
+                                var partes = line.split('|')
+                                if(partes.length === 2 && partes[0] && partes[1])
+                                return {
+                                    name: partes[0].trim(),
+                                    version: partes[1].trim()
+                                }
+                            }
+                        }).filter(function( element ) {
+                            return element !== undefined;
+                        });
+                        api.dependencies = dependencies
+                        resolve(api);
+                    }).catch(err => {
+                        if(err.status === 404){
+                            var msj = api.name + ' ' + api.version + ' no tiene declaradas las dependencias'
+                            console.error(msj)
+                            if(strictCheck){
+                                reject(msj)
+                            } else {
+                                resolve(api)
+                            }
+                        } else {
+                            console.error('Error ' + err.status + ' buscando dependencias de ' + api.name)
+                        }
+                    })
+                });
+            })
+        ).then(function(prom, e){
+            res.send(prom)
+        }).catch(err => res.status(400).send(err)); //Promise.all error
+
+    }).catch(err => res.send(err)) //get compose content error
 
 });
 
