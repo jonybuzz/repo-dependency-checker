@@ -9,6 +9,7 @@
     "@octokit/auth-basic": "^1.0.2",
     "@octokit/rest": "^16.32.0",
     "base-64": "^0.1.0",
+    "color-output": "^1.0.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
@@ -16,5 +17,10 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "yaml": "^1.7.1"
+  },
+  "devDependencies": {
+    "console-error": "0.0.4",
+    "console-info": "0.0.5",
+    "console-warn": "0.0.4"
   }
 }
