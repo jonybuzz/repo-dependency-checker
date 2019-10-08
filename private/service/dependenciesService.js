@@ -1,6 +1,7 @@
 const githubFileService = require('./githubFileService')
+const composeParser = require('../utils/composeParser')
+const dependenciesParser = require('../utils/dependenciesParser')
 var base64 = require('base-64')
-const YAML = require('yaml')
 const semver = require('semver')
 
 function findDependencies(params, strictCheck, resolve, reject){
@@ -12,16 +13,9 @@ function findDependencies(params, strictCheck, resolve, reject){
         ref: params.ref
     }).then(function(resp){
         var composeContent = base64.decode(resp.data.content)
-        var composeYaml = YAML.parse(composeContent)
-        var apis = Object.entries(composeYaml.services).map(function(entry){
-            var service = entry[1]
-            var imageAndTag = service.image.split('/')[1]
-            var image = imageAndTag.split(':')[0]
-            var tag = 'v' + imageAndTag.split(':')[1]
-            return {name: image, version: tag}
-        })
+        var apis = composeParser.parseYaml(composeContent)
 
-        var results = Promise.all(apis.map(function(api) {
+        Promise.all(apis.map(function(api) {
                 console.debug('Buscando dependencias de ' + api.name)
 
                 return new Promise((res, rej) => {
@@ -32,18 +26,7 @@ function findDependencies(params, strictCheck, resolve, reject){
                         ref: api.version
                     }).then(resp => {
                         var dependenciesMdContent = base64.decode(resp.data.content)
-                        lines = dependenciesMdContent.split("\n");
-                        lines.shift(); lines.shift() //para eliminar header de tabla
-                        var dependencies = lines.map(function(line){
-                            if(line){
-                                var partes = line.split('|')
-                                if(partes.length === 2 && partes[0] && partes[1])
-                                return {name: partes[0].trim(), version: partes[1].trim()}
-                            }
-                        }).filter(function( element ) {
-                            return element !== undefined;
-                        });
-                        api.dependencies = dependencies
+                        api.dependencies = dependenciesParser.parseMarkdown(dependenciesMdContent)
                         res(api);
                     }).catch(err => {
                         if(err.status === 404){
