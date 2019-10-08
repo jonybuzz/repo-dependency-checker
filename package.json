@@ -6,7 +6,6 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@octokit/auth-basic": "^1.0.2",
     "@octokit/rest": "^16.32.0",
     "base-64": "^0.1.0",
     "color-output": "^1.0.3",
