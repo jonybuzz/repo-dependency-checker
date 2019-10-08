@@ -11,4 +11,13 @@ router.get('/dependencies/:owner/:repo/:ref/:path', function(req, res, next) {
     })
 });
 
+router.get('/validate/:owner/:repo/:ref/:path', function(req, res, next) {
+
+    dependenciesService.validateDependencies(req.params, req.query.strict, response => {
+        res.status(200).send(response)
+    }, error => {
+        res.status(400).send(error)
+    })
+});
+
 module.exports = router;

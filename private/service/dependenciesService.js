@@ -1,6 +1,7 @@
 const githubFileService = require('./githubFileService')
 var base64 = require('base-64')
 const YAML = require('yaml')
+const semver = require('semver')
 
 function findDependencies(params, strictCheck, resolve, reject){
 
@@ -16,11 +17,8 @@ function findDependencies(params, strictCheck, resolve, reject){
             var service = entry[1]
             var imageAndTag = service.image.split('/')[1]
             var image = imageAndTag.split(':')[0]
-            var tag = imageAndTag.split(':')[1]
-            return {
-                name: image,
-                version: tag
-            }
+            var tag = 'v' + imageAndTag.split(':')[1]
+            return {name: image, version: tag}
         })
 
         var results = Promise.all(apis.map(function(api) {
@@ -31,20 +29,16 @@ function findDependencies(params, strictCheck, resolve, reject){
                         owner: params.owner,
                         repo: api.name,
                         path: 'DEPENDENCIES.md',
-                        ref: 'v' + api.version
+                        ref: api.version
                     }).then(resp => {
                         var dependenciesMdContent = base64.decode(resp.data.content)
                         lines = dependenciesMdContent.split("\n");
-                        lines.shift()
-                        lines.shift() //para eliminar header de tabla
+                        lines.shift(); lines.shift() //para eliminar header de tabla
                         var dependencies = lines.map(function(line){
                             if(line){
                                 var partes = line.split('|')
                                 if(partes.length === 2 && partes[0] && partes[1])
-                                return {
-                                    name: partes[0].trim(),
-                                    version: partes[1].trim()
-                                }
+                                return {name: partes[0].trim(), version: partes[1].trim()}
                             }
                         }).filter(function( element ) {
                             return element !== undefined;
@@ -53,7 +47,7 @@ function findDependencies(params, strictCheck, resolve, reject){
                         res(api);
                     }).catch(err => {
                         if(err.status === 404){
-                            var msj = api.name + ' ' + api.version + ' no tiene declaradas las dependencias'
+                            var msj = api.name + ' ' + api.version + ' DEPENDENCIES.md Not Found'
                             console.error(msj)
                             if(strictCheck){
                                 rej(msj)
@@ -69,7 +63,39 @@ function findDependencies(params, strictCheck, resolve, reject){
         ).then(resolve).catch(reject); //Promise.all error
 
     }).catch(reject) //get compose content error
+}
 
+function validateDependencies(params, strictCheck, resolve, reject){
+
+    findDependencies(params, strictCheck, apis => {
+        var validatedApis = apis.map(api => {
+            console.debug('\nValidating ' + api.name)
+            if(api.dependencies){
+                api.dependencies = api.dependencies.map(dependency => {
+                    console.debug('Validating dependency ' + dependency.name)
+                    var dependencyInRoot = apis.find(function(item){
+                        return item.name == dependency.name
+                    })
+                    if(dependencyInRoot) {
+                        var satisfies = semver.satisfies(dependencyInRoot.version, dependency.version)
+                        console.debug(satisfies + ' => ' + dependencyInRoot.version + '/' + dependency.version)
+                        if(satisfies) {
+                            dependency.validation = 'OK'
+                        } else {
+                            dependency.validation = 'NOT_SATISFIED'
+                        }
+                    } else {
+                        console.debug('not found')
+                        dependency.validation = 'NOT_FOUND'
+                    }
+                    return dependency
+                })
+            }
+            return api
+        });
+        resolve(validatedApis)
+    }, reject)
 }
 
 module.exports.findDependencies = findDependencies
+module.exports.validateDependencies = validateDependencies
