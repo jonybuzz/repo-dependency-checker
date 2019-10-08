@@ -77,16 +77,24 @@ function validateDependencies(params, strictCheck, resolve, reject){
                         return item.name == dependency.name
                     })
                     if(dependencyInRoot) {
-                        var satisfies = semver.satisfies(dependencyInRoot.version, dependency.version)
+                        var satisfies = semver.satisfies(dependencyInRoot.version, '>=' + dependency.version)
                         console.debug(satisfies + ' => ' + dependencyInRoot.version + '/' + dependency.version)
+                        dependency.validation = {
+                            required: dependency.version,
+                            actual: dependencyInRoot.version
+                        }
                         if(satisfies) {
-                            dependency.validation = 'OK'
+                            dependency.validation.status = 'OK'
                         } else {
-                            dependency.validation = 'NOT_SATISFIED'
+                            dependency.validation.status = 'NOT_SATISFIED'
                         }
                     } else {
                         console.debug('not found')
-                        dependency.validation = 'NOT_FOUND'
+                        dependency.validation = {
+                            required: dependency.version,
+                            actual: null,
+                            status: 'NOT_FOUND'
+                        }
                     }
                     return dependency
                 })
