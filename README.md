@@ -38,11 +38,11 @@ It will list all projects with their declared dependencies
       "dependencies":[
          {
             "name":"second-api",
-            "version":"4.2.0"
+            "version":">=4.2.0"
          },
          {
             "name":"other-dep",
-            "version":"1.1.1"
+            "version":"1.1.x"
          }
       ]
    },
