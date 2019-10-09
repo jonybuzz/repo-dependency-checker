@@ -7,8 +7,8 @@ function getFileContent(getContentsOptions){
             username: config.credentials.username,
             password: config.credentials.password
         },
-        userAgent: 'repo-dependency-checker v1.0.0',
-        baseUrl: 'https://api.github.com',
+        userAgent: config.application.name + ' ' + config.application.version,
+        baseUrl: config.github.api,
         log: {
             debug: () => {},
             info: console.info,

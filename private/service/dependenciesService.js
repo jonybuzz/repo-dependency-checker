@@ -4,12 +4,16 @@ const dependenciesParser = require('../utils/dependenciesParser')
 const base64 = require('base-64')
 const semver = require('semver')
 
+const COMPOSE_EXTENSION = '.yml'
+const REPO_TAG_PREFIX = 'v'
+const DEPENDENCIES_FILEPATH = 'DEPENDENCIES.md'
+
 function findDependencies(params, strictCheck, resolve, reject){
 
     githubFileService.getFileContent({
         owner: params.owner,
         repo: params.repo,
-        path: params.path + '.yml',
+        path: params.path + COMPOSE_EXTENSION,
         ref: params.ref
     }).then(function(response){
         var composeContent = base64.decode(response.data.content)
@@ -29,8 +33,10 @@ function validateDependencies(params, strictCheck, resolve, reject){
         var validatedApis = apis.map(api => {
             console.debug('\nValidating ' + api.name + '...')
             if(api.dependencies){
-                api.dependencies = api.dependencies.map(dependency =>
-                    dependency.validation = getValidation(dependency, apis))
+                api.dependencies = api.dependencies.map(dependency => {
+                    dependency.validation = getValidation(dependency, apis)
+                    return dependency
+                })
             }
             return api
         });
@@ -46,8 +52,8 @@ function populateDependenciesAsync(api, owner, strictCheck) {
         githubFileService.getFileContent({
             owner: owner,
             repo: api.name, //repo name must be equal to api name
-            path: 'DEPENDENCIES.md',
-            ref: 'v' + api.version
+            path: DEPENDENCIES_FILEPATH,
+            ref: REPO_TAG_PREFIX + api.version
         }).then(response => {
             var dependenciesMdContent = base64.decode(response.data.content)
             api.dependencies = dependenciesParser.parseMarkdown(dependenciesMdContent)
@@ -55,7 +61,7 @@ function populateDependenciesAsync(api, owner, strictCheck) {
             return
         }).catch(err => {
             if(err.status === 404) {
-                var msj = api.name + ' ' + api.version + ' DEPENDENCIES.md Not Found'
+                var msj = api.name + ' ' + api.version + ' ' + DEPENDENCIES_FILEPATH + ' Not Found'
                 console.error(msj)
                 if(strictCheck){
                     rej(msj)
@@ -90,7 +96,7 @@ function getValidation(dependency, apis){
             validation.status = 'NOT_SATISFIED'
         }
     } else {
-        console.debug('not found')
+        console.debug('Not found')
         validation = {
             required: dependency.version,
             actual: null,
