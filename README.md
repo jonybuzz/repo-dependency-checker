@@ -34,26 +34,26 @@ It will list all projects with their declared dependencies
 [
    {
       "name":"first-api",
-      "version":"v11.7.9",
+      "version":"11.7.9",
       "dependencies":[
          {
             "name":"second-api",
-            "version":"v4.2.0"
+            "version":"4.2.0"
          },
          {
             "name":"other-dep",
-            "version":"v1.1.1"
+            "version":"1.1.1"
          }
       ]
    },
    {
       "name":"second-api",
-      "version":"v4.5.0",
+      "version":"4.5.0",
       "dependencies":[]
    },
    {
       "name":"other-dep",
-      "version":"v1.0.0",
+      "version":"1.0.0",
       "dependencies":[]
    }
 ]
@@ -61,7 +61,7 @@ It will list all projects with their declared dependencies
 
 ### Validate dependencies
 
-It lists all projects and show info about their dependency validation.
+It lists all projects and show info about their dependency validation. Possible status values are: `OK`, `NOT_SATISFIED` and `NOT_FOUND`
 
 `GET http://localhost:3000/api/validate/{organization}/{repo}/{branch or tag}/{path to compose}`
 
@@ -69,21 +69,21 @@ It lists all projects and show info about their dependency validation.
 [
    {
       "name":"first-api",
-      "version":"v11.7.9",
+      "version":"11.7.9",
       "dependencies":[
          {
             "name":"second-api",
             "validation":{
-               "required":"v4.2.0",
-               "actual":"v4.5.0",
+               "required":"4.2.0",
+               "actual":"4.5.0",
                "status":"OK"
             }
          },
          {
             "name":"other-dep",
             "validation":{
-               "required":"v1.1.1",
-               "actual":"v1.0.0",
+               "required":"1.1.1",
+               "actual":"1.0.0",
                "status":"NOT_SATISFIED"
             }
          }
@@ -91,12 +91,12 @@ It lists all projects and show info about their dependency validation.
    },
    {
       "name":"second-api",
-      "version":"v4.5.0",
+      "version":"4.5.0",
       "dependencies":[]
    },
    {
       "name":"other-dep",
-      "version":"v1.0.0",
+      "version":"1.0.0",
       "dependencies":[]
    }
 ]
