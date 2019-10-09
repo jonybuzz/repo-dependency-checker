@@ -61,7 +61,7 @@ It will list all projects with their declared dependencies
 
 ### Validate dependencies
 
-It lists all projects and show info about their dependency validation. Possible status values are: `OK`, `NOT_SATISFIED` and `NOT_FOUND`
+It lists all projects and show info about their dependency validation, using semver syntax. Possible status values are: `OK`, `NOT_SATISFIED` and `NOT_FOUND`
 
 `GET http://localhost:3000/api/validate/{organization}/{repo}/{branch or tag}/{path to compose}`
 
@@ -74,7 +74,7 @@ It lists all projects and show info about their dependency validation. Possible 
          {
             "name":"second-api",
             "validation":{
-               "required":"4.2.0",
+               "required":">=4.2.0",
                "actual":"4.5.0",
                "status":"OK"
             }
@@ -82,7 +82,7 @@ It lists all projects and show info about their dependency validation. Possible 
          {
             "name":"other-dep",
             "validation":{
-               "required":"1.1.1",
+               "required":"1.1.x",
                "actual":"1.0.0",
                "status":"NOT_SATISFIED"
             }
