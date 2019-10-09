@@ -1,4 +1,5 @@
 const YAML = require('yaml')
+const semver = require('semver')
 
 function parseYaml(fileContent){
     var composeYaml = YAML.parse(fileContent)
@@ -6,8 +7,11 @@ function parseYaml(fileContent){
         var service = entry[1]
         var imageAndTag = service.image.split('/')[1]
         var image = imageAndTag.split(':')[0]
-        var tag = 'v' + imageAndTag.split(':')[1]
-        return {name: image, version: tag}
+        var tag = semver.clean(imageAndTag.split(':')[1])
+        return {
+            name: image,
+            version: tag
+        }
     })
     return apis
 }
