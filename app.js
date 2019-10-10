@@ -23,7 +23,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/', indexRouter);
 app.use('/api', dependenciesRouter);
+app.use('/static/js', express.static(__dirname + '/node_modules/handlebars/dist')); // redirect bootstrap JS
+app.use('/static/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
+app.use('/static/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
+app.use('/static/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

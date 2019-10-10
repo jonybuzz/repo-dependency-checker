@@ -16,7 +16,7 @@ router.get('/validate/:owner/:repo/:ref/:path', function(req, res, next) {
     dependenciesService.validateDependencies(req.params, req.query.strict, response => {
         res.status(200).send(response)
     }, error => {
-        res.status(400).send(error)
+        res.status(400).send({message: error})
     })
 });
 
