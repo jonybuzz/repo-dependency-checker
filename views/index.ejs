@@ -70,6 +70,10 @@
             </ul>
         </script>
         <script>
+            $('#organizationName').val(getURLParameter('organization'));
+            $('#composeRepo').val(getURLParameter('repo'));
+            $('#composeRef').val(getURLParameter('ref'));
+            $('#composePath').val(getURLParameter('path'));
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
             $('#validate-btn').on('click', function(event){
@@ -95,6 +99,16 @@
                         })
                 }
             })
+            function getURLParameter(sParam) {
+                var sPageURL = window.location.search.substring(1);
+                var sURLVariables = sPageURL.split('&');
+                for (var i = 0; i < sURLVariables.length; i++) {
+                    var sParameterName = sURLVariables[i].split('=');
+                    if (sParameterName[0] == sParam) {
+                        return sParameterName[1];
+                    }
+                }
+            }
         </script>
     </body>
 </html>
