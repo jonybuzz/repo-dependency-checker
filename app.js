@@ -29,6 +29,7 @@ app.use('/static/js', express.static(__dirname + '/node_modules/handlebars/dist'
 app.use('/static/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/static/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
 app.use('/static/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
+app.use('/static/js', express.static(__dirname + '/node_modules/url-parse/dist')); // redirect CSS bootstrap
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
