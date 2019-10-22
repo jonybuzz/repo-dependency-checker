@@ -16,25 +16,6 @@
                     <label for="composeUrl">Compose URL</label>
                     <input type="text" class="form-control" id="composeUrl">
                 </div>
-            </form>
-            <hr>
-            <form class="form">
-                <div class="form-group">
-                    <label for="organizationName">Organization</label>
-                    <input type="text" class="form-control form-control-sm" id="organizationName" placeholder="my-company">
-                </div>
-                <div class="form-group">
-                    <label for="composeRepo">Repo</label>
-                    <input type="text" class="form-control form-control-sm" id="composeRepo" placeholder="deploy-repository" >
-                </div>
-                <div class="form-group">
-                    <label for="composeRef">Branch or tag</label>
-                    <input type="text" class="form-control form-control-sm" id="composeRef" placeholder="master">
-                </div>
-                <div class="form-group">
-                    <label for="composePath">Path to compose</label>
-                    <input type="text" class="form-control form-control-sm" id="composePath" placeholder="compose.yml">
-                </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="strictCheck">
                     <label class="form-check-label" for="strictCheck">Strict Check</label>
@@ -79,41 +60,16 @@
         </script>
         <script>
             $('#composeUrl').val(getURLParameter('composeUrl'));
-            autocompletarDesdeComposeUrl(getURLParameter('composeUrl'));
-            $('#composeUrl').bind('input', function() {
-                var composeUrl = $(this).val();
-                autocompletarDesdeComposeUrl($(this).val())
-            });
-
-            function autocompletarDesdeComposeUrl(composeUrl) {
-                var parsedUrl = new URL(composeUrl);
-                var pathSegments = parsedUrl.pathname.split('/');
-                $('#organizationName').val(pathSegments[1]);
-                $('#composeRepo').val(pathSegments[2]);
-                $('#composeRef').val(pathSegments[4]);
-                $('#composePath').val(pathSegments[5]);
-            }
-
-            if(getURLParameter('organization')){
-                $('#organizationName').val(getURLParameter('organization'));
-            }
-            if(getURLParameter('repo')){
-                $('#composeRepo').val(getURLParameter('repo'));
-            }
-            if(getURLParameter('ref')){
-                $('#composeRef').val(getURLParameter('ref'));
-            }
-            if(getURLParameter('path')){
-                $('#composePath').val(getURLParameter('path'));
-            }
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
             $('#validate-btn').on('click', function(event){
                 event.preventDefault()
-                var organization = $('#organizationName').val()
-                var repo = $('#composeRepo').val()
-                var composeRef = $('#composeRef').val()
-                var composePath = $('#composePath').val().replace('.yml', '')
+                var parsedUrl = new URL($('#composeUrl').val());
+                var pathSegments = parsedUrl.pathname.split('/');
+                var organization = pathSegments[1]
+                var repo = pathSegments[2]
+                var composeRef = pathSegments[4]
+                var composePath = pathSegments[5].replace('.yml', '')
                 var strictCheck = $('#strictCheck').prop('checked')
                 if(organization && repo && composePath && composeRef){
                     var jqxhr = $.get( "/api/validate/" + organization + '/' + repo + '/' + composeRef + '/' + composePath + (strictCheck? '?strict=true' : ''))
