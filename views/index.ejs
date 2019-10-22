@@ -10,11 +10,16 @@
           <a class="navbar-brand" href="#">Repo Dependency Checker</a>
         </nav>
         <div class="container">
-            <h2 class="mt-3">Dependency Validation</h2>
+            <h2 class="mt-3">Compose Validation</h2>
             <form class="form">
                 <div class="form-group">
-                    <label for="composeUrl">Compose URL</label>
-                    <input type="text" class="form-control" id="composeUrl">
+                    <label for="composeUrl">URL to file</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">https://github.com/</span>
+                        </div>
+                        <input type="text" class="form-control" id="composeUrl">
+                    </div>
                 </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="strictCheck">
@@ -64,12 +69,11 @@
             var template = Handlebars.compile(source);
             $('#validate-btn').on('click', function(event){
                 event.preventDefault()
-                var parsedUrl = new URL($('#composeUrl').val());
-                var pathSegments = parsedUrl.pathname.split('/');
-                var organization = pathSegments[1]
-                var repo = pathSegments[2]
-                var composeRef = pathSegments[4]
-                var composePath = pathSegments[5].replace('.yml', '')
+                var pathSegments = $('#composeUrl').val().split('/');
+                var organization = pathSegments[0]
+                var repo = pathSegments[1]
+                var composeRef = pathSegments[3]
+                var composePath = pathSegments[4].replace('.yml', '')
                 var strictCheck = $('#strictCheck').prop('checked')
                 if(organization && repo && composePath && composeRef){
                     var jqxhr = $.get( "/api/validate/" + organization + '/' + repo + '/' + composeRef + '/' + composePath + (strictCheck? '?strict=true' : ''))
