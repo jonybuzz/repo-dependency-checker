@@ -80,7 +80,13 @@
             </ul>
         </script>
         <script>
-            $('#composeUrl').val(getURLParameter('composeUrl').split('https://github.com/')[1]);
+            var githubUrlRoot = 'https://github.com/'
+            var composeUrl = getURLParameter('composeUrl')
+            if(composeUrl.startsWith(githubUrlRoot)) {
+                $('#composeUrl').val(composeUrl.split('https://github.com/')[1]);
+            } else {
+                $('#composeUrl').val(composeUrl);
+            }
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
             $('#composeUrl').on('paste', function(e) {

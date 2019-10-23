@@ -91,7 +91,13 @@
             </ul>
         </script>
         <script>
-            $('#composeUrl').val(getURLParameter('composeUrl').split('https://github.com/')[1]);
+            var githubUrlRoot = 'https://github.com/'
+            var composeUrl = getURLParameter('composeUrl')
+            if(composeUrl.startsWith(githubUrlRoot)) {
+                $('#composeUrl').val(composeUrl.split('https://github.com/')[1]);
+            } else {
+                $('#composeUrl').val(composeUrl);
+            }
             $('#appRepo').val(getURLParameter('appRepo'));
             $('#release').val(getURLParameter('release'));
             $('#composeUrl').on('paste', function(e) {
