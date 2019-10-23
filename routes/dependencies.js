@@ -20,4 +20,13 @@ router.get('/validate/:owner/:repo/:ref/:path', function(req, res, next) {
     })
 });
 
+router.get('/validate/:owner/:repo/:ref/:path/:app/:release', function(req, res, next) {
+
+    dependenciesService.validateAppDependencies(req.params, req.query.strict, response => {
+        res.status(200).send(response)
+    }, error => {
+        res.status(400).send({message: error})
+    })
+});
+
 module.exports = router;

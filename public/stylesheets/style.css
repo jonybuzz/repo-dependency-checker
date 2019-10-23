@@ -1,3 +1,8 @@
+font-family: 'Fugaz One', cursive;
 body {
     background-color: #f8f9fa;
+}
+
+.brand {
+    font-family: 'Fugaz One'
 }

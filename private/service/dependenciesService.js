@@ -45,6 +45,37 @@ function validateDependencies(params, strictCheck, resolve, reject){
 }
 
 
+function validateAppDependencies(params, strictCheck, resolve, reject){
+
+    githubFileService.getFileContent({
+        owner: params.owner,
+        repo: params.repo,
+        path: params.path + COMPOSE_EXTENSION,
+        ref: params.ref
+    }).then(function(response){
+        var composeContent = base64.decode(response.data.content)
+        var apis = composeParser.parseYaml(composeContent)
+        var api = {
+            name: params.app,
+            version: params.release
+        }
+        populateDependenciesAsync(api, params.owner, strictCheck)
+            .then(api => {
+                console.debug('\nValidating ' + api.name + '...')
+                if(api.dependencies){
+                    api.dependencies = api.dependencies.map(dependency => {
+                        dependency.validation = getValidation(dependency, apis)
+                        return dependency
+                    })
+                }
+                resolve(api)
+            }).catch(reject)
+
+    }).catch(reject)
+
+}
+
+
 function populateDependenciesAsync(api, owner, strictCheck) {
 
     return new Promise((res, rej) => {
@@ -108,3 +139,4 @@ function getValidation(dependency, apis){
 
 module.exports.findDependencies = findDependencies
 module.exports.validateDependencies = validateDependencies
+module.exports.validateAppDependencies = validateAppDependencies
