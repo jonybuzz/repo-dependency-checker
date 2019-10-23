@@ -33,7 +33,7 @@
                     <label for="composeUrl">URL to compose</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon3">https://github.com/</span>
+                            <span class="input-group-text">https://github.com/</span>
                         </div>
                         <input type="text" class="form-control" id="composeUrl">
                     </div>
@@ -44,7 +44,12 @@
                 </div>
                 <div class="form-group">
                     <label for="release">Release</label>
-                    <input type="text" class="form-control" id="release">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">v</span>
+                        </div>
+                        <input type="text" class="form-control" id="release">
+                    </div>
                 </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="strictCheck">
@@ -86,9 +91,16 @@
             </ul>
         </script>
         <script>
-            $('#composeUrl').val(getURLParameter('composeUrl'));
+            $('#composeUrl').val(getURLParameter('composeUrl').split('https://github.com/')[1]);
             $('#appRepo').val(getURLParameter('appRepo'));
             $('#release').val(getURLParameter('release'));
+            $('#composeUrl').on('paste', function(e) {
+                var $input = $(this)
+                var text = e.originalEvent.clipboardData.getData('text');
+                setTimeout(function () {
+                    $input.val(text.split('https://github.com/')[1])
+                }, 100);
+            })
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
             $('#validate-btn').on('click', function(event){

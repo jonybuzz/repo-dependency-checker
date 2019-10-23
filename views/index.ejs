@@ -80,10 +80,17 @@
             </ul>
         </script>
         <script>
-            $('#composeUrl').val(getURLParameter('composeUrl'));
+            $('#composeUrl').val(getURLParameter('composeUrl').split('https://github.com/')[1]);
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
-            $('#validate-btn').on('click', function(event){
+            $('#composeUrl').on('paste', function(e) {
+                var $input = $(this)
+                var text = e.originalEvent.clipboardData.getData('text');
+                setTimeout(function () {
+                    $input.val(text.split('https://github.com/')[1])
+                }, 100);
+            })
+            $('#validate-btn').on('click', function(event) {
                 event.preventDefault()
                 var pathSegments = $('#composeUrl').val().split('/');
                 var organization = pathSegments[0]
