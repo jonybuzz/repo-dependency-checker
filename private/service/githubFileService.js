@@ -3,10 +3,11 @@ const config = require('../config');
 
 function getFileContent(getContentsOptions){
     const octokit = Octokit({
-            auth: {
-            username: config.credentials.username,
-            password: config.credentials.password
-        },
+            auth: "token " + TOKEN,
+        //     {
+        //     username: config.credentials.username,
+        //     password: config.credentials.password
+        // },
         userAgent: config.application.name + ' ' + config.application.version,
         baseUrl: config.github.api,
         log: {

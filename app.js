@@ -3,10 +3,27 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 var indexRouter = require('./routes/index');
 var dependenciesRouter = require('./routes/dependencies');
+var authRouter = require('./routes/auth');
 var favicon = require('serve-favicon');
+
+var passport = require('passport')
+  , GitHubStrategy = require('passport-github').Strategy;
+const config = require('./private/config');
+passport.use(new GitHubStrategy(config.github,
+  function(accessToken, refreshToken, profile, userAuthenticated) {
+      console.dir(accessToken)
+      console.info('Login user: ' + profile.username)
+      userAuthenticated(null, profile);
+  }
+));
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 var app = express();
 
@@ -25,8 +42,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', indexRouter);
 app.use('/api', dependenciesRouter);
+app.use('/', authRouter);
+
 app.use('/static/js', express.static(__dirname + '/node_modules/handlebars/dist')); // redirect bootstrap JS
 app.use('/static/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/static/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
