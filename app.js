@@ -3,12 +3,19 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 var indexRouter = require('./routes/index');
 var dependenciesRouter = require('./routes/dependencies');
+var authRouter = require('./routes/auth');
 var favicon = require('serve-favicon');
-
+const session = require('express-session');
+const config = require('./private/config');
 var app = express();
+
+app.use(session({
+    secret: 'rdc-98765',
+    resave: false,
+    saveUninitialized: true
+}))
 
 require('console-error');
 require('console-info');
@@ -27,6 +34,8 @@ app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
 
 app.use('/', indexRouter);
 app.use('/api', dependenciesRouter);
+app.use('/', authRouter);
+
 app.use('/static/js', express.static(__dirname + '/node_modules/handlebars/dist')); // redirect bootstrap JS
 app.use('/static/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/static/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery

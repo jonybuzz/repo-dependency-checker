@@ -6,6 +6,7 @@
         <link href="https://fonts.googleapis.com/css?family=Fugaz+One&display=swap" rel="stylesheet">
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='shortcut icon' type='image/x-icon' href='/images/favicon.ico' />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
 
@@ -20,9 +21,12 @@
                         <a class="nav-link" href="#">Compose Validation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dependencies/repo">Repo Validation</a>
+                        <a class="nav-link" href="/repo">Repo Validation</a>
                     </li>
                 </ul>
+                <span class="navbar-text ml-auto">
+                    <i class="fa fa-github"></i> <%= username %>
+                </span>
             </div>
         </nav>
 
@@ -82,7 +86,7 @@
         <script>
             var githubUrlRoot = 'https://github.com/'
             var composeUrl = getURLParameter('composeUrl')
-            if(composeUrl.startsWith(githubUrlRoot)) {
+            if(composeUrl && composeUrl.startsWith(githubUrlRoot)) {
                 $('#composeUrl').val(composeUrl.split('https://github.com/')[1]);
             } else {
                 $('#composeUrl').val(composeUrl);
@@ -93,7 +97,9 @@
                 var $input = $(this)
                 var text = e.originalEvent.clipboardData.getData('text');
                 setTimeout(function () {
-                    $input.val(text.split('https://github.com/')[1])
+                    if($input.val().indexOf(githubUrlRoot) > -1){
+                        $input.val(text.split(githubUrlRoot)[1])
+                    }
                 }, 100);
             })
             $('#validate-btn').on('click', function(event) {
@@ -123,7 +129,7 @@
             $('.validation-result').on('click', '.app-detail-btn', function(event){
                 event.preventDefault()
                 $a = $(event.target)
-                window.location = '/dependencies/repo?composeUrl=' + $('#composeUrl').val() + '&appRepo=' + $a.data('appRepo') + '&release=' + $a.data('release');
+                window.location = '/repo?composeUrl=' + $('#composeUrl').val() + '&appRepo=' + $a.data('appRepo') + '&release=' + $a.data('release');
             })
             function getURLParameter(sParam) {
                 var sPageURL = window.location.search.substring(1);

@@ -1,12 +1,9 @@
 const Octokit = require("@octokit/rest")
 const config = require('../config');
 
-function getFileContent(getContentsOptions){
+function getFileContent(getContentsOptions, token){
     const octokit = Octokit({
-            auth: {
-            username: config.credentials.username,
-            password: config.credentials.password
-        },
+        auth: 'token ' + token,
         userAgent: config.application.name + ' ' + config.application.version,
         baseUrl: config.github.api,
         log: {
