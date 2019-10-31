@@ -105,6 +105,8 @@
             })
             $('#validate-btn').on('click', function(event) {
                 event.preventDefault();
+                var boton = $(event.target);
+                boton.prop('disabled', true);
                 $('.btn-loading-go').removeClass('invisible');
                 $('.validation-result').hide();
                 var pathSegments = $('#composeUrl').val().split('/');
@@ -128,6 +130,7 @@
                             }
                         })
                         .always(function(){
+                            boton.prop('disabled', false);
                             $('.btn-loading-go').addClass('invisible');
                         })
                 }
