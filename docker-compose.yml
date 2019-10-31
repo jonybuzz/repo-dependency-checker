@@ -9,6 +9,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-        - RDC_USERNAME=${RDC_USERNAME}
-        - RDC_PASSWORD=${RDC_PASSWORD}
+        - RDC_CLIENT_ID=${RDC_CLIENT_ID}
+        - RDC_CLIENT_SECRET=${RDC_CLIENT_SECRET}
+        - RDC_AUTH_CALLBACK_URL=${RDC_AUTH_CALLBACK_URL}
     command: "npm start"
