@@ -4,6 +4,7 @@ var passport = require('passport')
 const { oauthLoginUrl } = require("@octokit/oauth-login-url")
 const { createOAuthAppAuth } = require("@octokit/auth-oauth-app");
 const config = require('../private/config');
+const Octokit = require("@octokit/rest")
 
 router.get('/auth', function(req, res){
     loginUrl = oauthLoginUrl({
@@ -18,7 +19,6 @@ router.get('/auth', function(req, res){
 });
 
 router.get('/auth/callback', function(req, res) {
-    console.dir(req.query)
     var code = req.query.code;
     var options = {
         clientId: config.github.clientID,
@@ -29,9 +29,18 @@ router.get('/auth/callback', function(req, res) {
     const auth = createOAuthAppAuth(options);
     auth({type: "token"})
         .then(tokenAuth => {
-            console.dir(tokenAuth)
-            req.session.token = tokenAuth.token;
-            res.redirect('/');
+            const octokit = Octokit({
+                auth: 'token ' + tokenAuth.token,
+                userAgent: config.application.name + ' ' + config.application.version,
+                baseUrl: config.github.api
+            });
+            octokit.users.getAuthenticated()
+            .then(response => {
+                console.dir(response.data)
+                req.session.user = {name: response.data.login};
+                req.session.token = tokenAuth.token;
+                res.redirect('/');
+            })
         }).catch(error => {
             console.dir(error);
             res.render('error', {message: 'Ups', error: error})

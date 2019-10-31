@@ -34,7 +34,7 @@ function loggedIn(req, res, next) {
     if (req.session.token) {
         next();
     } else {
-        res.redirect('/auth/github');
+        res.redirect('/auth');
     }
 }
 

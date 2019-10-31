@@ -21,19 +21,19 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// passport.serializeUser(function(user, cb) {
-//   cb(null, user);
-// });
-// passport.deserializeUser(function(obj, cb) {
-//   cb(null, obj);
-// });
-// passport.use(new GitHubStrategy(config.github,
-//   function(accessToken, refreshToken, profile, userAuthenticated) {
-//       console.info('Logged-in user: ' + profile.username);
-//       profile.token = accessToken;
-//       return userAuthenticated(null, profile);
-//   }
-// ));
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
+passport.use(new GitHubStrategy(config.github,
+  function(accessToken, refreshToken, profile, userAuthenticated) {
+      console.info('Logged-in user: ' + profile.username);
+      profile.token = accessToken;
+      return userAuthenticated(null, profile);
+  }
+));
 
 require('console-error');
 require('console-info');

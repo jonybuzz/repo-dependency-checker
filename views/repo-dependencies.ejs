@@ -25,7 +25,7 @@
                     </li>
                 </ul>
                 <span class="navbar-text ml-auto">
-                    <i class="fa fa-github"></i> <%= user %>
+                    <i class="fa fa-github"></i> <%= username %>
                 </span>
             </div>
         </nav>
@@ -144,7 +144,7 @@
             $('.validation-result').on('click', '.app-detail-btn', function(event){
                 event.preventDefault()
                 $a = $(event.target)
-                window.location = '/dependencies/repo?composeUrl=' + $('#composeUrl').val() + '&appRepo=' + $a.data('appRepo') + '&release=' + $a.data('release');
+                window.location = '/repo?composeUrl=' + $('#composeUrl').val() + '&appRepo=' + $a.data('appRepo') + '&release=' + $a.data('release');
             })
             function getURLParameter(sParam) {
                 var sPageURL = window.location.search.substring(1);
