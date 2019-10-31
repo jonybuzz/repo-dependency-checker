@@ -60,6 +60,7 @@
                     <label class="form-check-label" for="strictCheck">Strict Check</label>
                 </div>
                 <button type="submit" class="btn btn-primary" id="validate-btn">Go!</button>
+                <span class="spinner-grow spinner-grow-sm invisible btn-loading-go" role="status"></span>
             </form>
             <div class="validation-result" style="display:none;">
                 <hr/>
@@ -116,7 +117,9 @@
             var source   = document.getElementById("validation-result-template").innerHTML;
             var template = Handlebars.compile(source);
             $('#validate-btn').on('click', function(event){
-                event.preventDefault()
+                event.preventDefault();
+                $('.btn-loading-go').removeClass('invisible');
+                $('.validation-result').hide();
                 var pathSegments = $('#composeUrl').val().split('/');
                 var organization = pathSegments[0]
                 var repo = pathSegments[1]
@@ -138,6 +141,9 @@
                             } else {
                                 alert(error.status + ': ' + error.responseJSON.message)
                             }
+                        })
+                        .always(function(){
+                            $('.btn-loading-go').addClass('invisible');
                         })
                 }
             })
