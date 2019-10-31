@@ -15,6 +15,8 @@ function loggedIn(req, res, next) {
     if (req.session.token) {
         next();
     } else {
+        console.dir(req.originalUrl);
+        req.session.previousUrl = req.originalUrl;
         res.redirect('/auth');
     }
 }

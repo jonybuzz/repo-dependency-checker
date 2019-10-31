@@ -1,6 +1,5 @@
 var express = require('express')
 var router = express.Router()
-var passport = require('passport')
 const { oauthLoginUrl } = require("@octokit/oauth-login-url")
 const { createOAuthAppAuth } = require("@octokit/auth-oauth-app");
 const config = require('../private/config');
@@ -36,10 +35,9 @@ router.get('/auth/callback', function(req, res) {
             });
             octokit.users.getAuthenticated()
             .then(response => {
-                console.dir(response.data)
                 req.session.user = {name: response.data.login};
                 req.session.token = tokenAuth.token;
-                res.redirect('/');
+                res.redirect(req.session.previousUrl);
             })
         }).catch(error => {
             console.dir(error);
