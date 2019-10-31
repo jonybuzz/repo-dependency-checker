@@ -8,18 +8,17 @@ const COMPOSE_EXTENSION = '.yml'
 const REPO_TAG_PREFIX = 'v'
 const DEPENDENCIES_FILEPATH = 'DEPENDENCIES.md'
 
-function findDependencies(params, strictCheck, resolve, reject){
-
+function findDependencies(params, strictCheck, token, resolve, reject){
     githubFileService.getFileContent({
         owner: params.owner,
         repo: params.repo,
         path: params.path + COMPOSE_EXTENSION,
         ref: params.ref
-    }).then(function(response){
+    }, token).then(function(response){
         var composeContent = base64.decode(response.data.content)
         var apis = composeParser.parseYaml(composeContent)
 
-        Promise.all(apis.map(api => populateDependenciesAsync(api, params.owner, strictCheck)))
+        Promise.all(apis.map(api => populateDependenciesAsync(api, params.owner, strictCheck, token)))
             .then(resolve)
             .catch(reject)
 
@@ -27,9 +26,8 @@ function findDependencies(params, strictCheck, resolve, reject){
 }
 
 
-function validateDependencies(params, strictCheck, resolve, reject){
-
-    findDependencies(params, strictCheck, apis => {
+function validateDependencies(params, strictCheck, token, resolve, reject){
+    findDependencies(params, strictCheck, token, apis => {
         var validatedApis = apis.map(api => {
             console.debug('\nValidating ' + api.name + '...')
             if(api.dependencies){
@@ -45,21 +43,21 @@ function validateDependencies(params, strictCheck, resolve, reject){
 }
 
 
-function validateAppDependencies(params, strictCheck, resolve, reject){
+function validateAppDependencies(params, strictCheck, token, resolve, reject){
 
     githubFileService.getFileContent({
         owner: params.owner,
         repo: params.repo,
         path: params.path + COMPOSE_EXTENSION,
         ref: params.ref
-    }).then(function(response){
+    }, token).then(function(response){
         var composeContent = base64.decode(response.data.content)
         var apis = composeParser.parseYaml(composeContent)
         var api = {
             name: params.app,
             version: params.release
         }
-        populateDependenciesAsync(api, params.owner, strictCheck)
+        populateDependenciesAsync(api, params.owner, strictCheck, token)
             .then(api => {
                 console.debug('\nValidating ' + api.name + '...')
                 if(api.dependencies){
@@ -76,7 +74,7 @@ function validateAppDependencies(params, strictCheck, resolve, reject){
 }
 
 
-function populateDependenciesAsync(api, owner, strictCheck) {
+function populateDependenciesAsync(api, owner, strictCheck, token) {
 
     return new Promise((res, rej) => {
         console.debug('Looking for ' + api.name + ' dependencies...')
@@ -85,7 +83,7 @@ function populateDependenciesAsync(api, owner, strictCheck) {
             repo: api.name, //repo name must be equal to api name
             path: DEPENDENCIES_FILEPATH,
             ref: REPO_TAG_PREFIX + api.version
-        }).then(response => {
+        }, token).then(response => {
             var dependenciesMdContent = base64.decode(response.data.content)
             api.dependencies = dependenciesParser.parseMarkdown(dependenciesMdContent)
             res(api)

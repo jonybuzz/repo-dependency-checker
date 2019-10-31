@@ -7,25 +7,33 @@ var indexRouter = require('./routes/index');
 var dependenciesRouter = require('./routes/dependencies');
 var authRouter = require('./routes/auth');
 var favicon = require('serve-favicon');
-
+const session = require('express-session');
 var passport = require('passport')
-  , GitHubStrategy = require('passport-github').Strategy;
+var GitHubStrategy = require('passport-github2').Strategy;
 const config = require('./private/config');
-passport.use(new GitHubStrategy(config.github,
-  function(accessToken, refreshToken, profile, userAuthenticated) {
-      console.dir(accessToken)
-      console.info('Login user: ' + profile.username)
-      userAuthenticated(null, profile);
-  }
-));
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
-
 var app = express();
+
+app.use(session({
+    secret: 'rdc-98765',
+    resave: false,
+    saveUninitialized: true
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+
+// passport.serializeUser(function(user, cb) {
+//   cb(null, user);
+// });
+// passport.deserializeUser(function(obj, cb) {
+//   cb(null, obj);
+// });
+// passport.use(new GitHubStrategy(config.github,
+//   function(accessToken, refreshToken, profile, userAuthenticated) {
+//       console.info('Logged-in user: ' + profile.username);
+//       profile.token = accessToken;
+//       return userAuthenticated(null, profile);
+//   }
+// ));
 
 require('console-error');
 require('console-info');
@@ -41,9 +49,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/api', dependenciesRouter);
