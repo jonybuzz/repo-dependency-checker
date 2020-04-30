@@ -19,7 +19,7 @@
     "express-session": "^1.17.0",
     "handlebars": "^4.4.3",
     "http-errors": "~1.6.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "morgan": "~1.9.1",
     "semver": "^6.3.0",
     "serve-favicon": "^2.5.0",
